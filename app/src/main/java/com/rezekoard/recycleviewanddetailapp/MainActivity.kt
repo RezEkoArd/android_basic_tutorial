@@ -2,15 +2,23 @@ package com.rezekoard.recycleviewanddetailapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
+
+//    Variable to RecycleView
     private lateinit var recycleView: RecyclerView
     private lateinit var dataList: ArrayList<DataClass>
     lateinit var imageList:Array<Int>
     lateinit var titleList:Array<String>
+
+    //Variable to Searchbar
+    private lateinit var searchView: SearchView
+    private lateinit var searchList: ArrayList<DataClass>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,11 +51,39 @@ class MainActivity : AppCompatActivity() {
         )
 
         recycleView = findViewById(R.id.recycleView)
+        searchView = findViewById(R.id.search)
         recycleView.layoutManager = LinearLayoutManager(this)
         recycleView.setHasFixedSize(true)
 
         dataList = arrayListOf<DataClass>()
+        searchList = arrayListOf<DataClass>()
         getData()
+
+        searchView.clearFocus()
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchView.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                searchList.clear()
+                val searchText = newText!!.toLowerCase(Locale.getDefault())
+                if (searchText.isNotEmpty()){
+                    dataList.forEach{
+                        if (it.dataTitle.toLowerCase(Locale.getDefault()).contains(searchText)) {
+                            searchList.add(it)
+                        }
+                    }
+                    recycleView.adapter!!.notifyDataSetChanged()
+                } else {
+                    searchList.clear()
+                    searchList.addAll(dataList)
+                    recycleView.adapter!!.notifyDataSetChanged()
+                }
+                return false
+            }
+        })
     }
 
 
@@ -56,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             val dataClass = DataClass(imageList[i], titleList[i])
             dataList.add(dataClass)
         }
-
-        recycleView.adapter = AdapterClass(dataList)
+        searchList.addAll(dataList)
+        recycleView.adapter = AdapterClass(searchList)
     }
 }

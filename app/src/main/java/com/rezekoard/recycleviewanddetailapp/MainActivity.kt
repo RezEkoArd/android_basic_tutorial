@@ -1,5 +1,6 @@
 package com.rezekoard.recycleviewanddetailapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -15,6 +16,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dataList: ArrayList<DataClass>
     lateinit var imageList:Array<Int>
     lateinit var titleList:Array<String>
+
+//    Variable to detail Activity
+    lateinit var descList:Array<String>
+    lateinit var descImageList:Array<Int>
+    private lateinit var myAdapter: AdapterClass
+
 
     //Variable to Searchbar
     private lateinit var searchView: SearchView
@@ -48,6 +55,34 @@ class MainActivity : AppCompatActivity() {
             "Text View",
             "EditText",
             "Camera",
+        )
+
+
+        // to detail Activity
+        descList = arrayOf(
+            getString(R.string.listview),
+            getString(R.string.checkbox),
+            getString(R.string.imageview),
+            getString(R.string.toggle),
+            getString(R.string.date),
+            getString(R.string.rating),
+            getString(R.string.time),
+            getString(R.string.textview),
+            getString(R.string.edit),
+            getString(R.string.camera),
+        )
+
+        descImageList = arrayOf(
+            R.drawable.list_detail,
+            R.drawable.check_detail,
+            R.drawable.image_detail,
+            R.drawable.toggle_detail,
+            R.drawable.date_detail,
+            R.drawable.rating_detail,
+            R.drawable.time_detail,
+            R.drawable.text_detail,
+            R.drawable.edit_detail,
+            R.drawable.camera_detail,
         )
 
         recycleView = findViewById(R.id.recycleView)
@@ -84,12 +119,21 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
+
+        myAdapter = AdapterClass(searchList)
+        recycleView.adapter = myAdapter
+
+        myAdapter.onItemClick = {
+            var intent = Intent(this, DetailActivity::class.java)
+            intent.putExtra("android", it)
+            startActivity(intent)
+        }
     }
 
 
     private fun getData(){
         for (i in imageList.indices){
-            val dataClass = DataClass(imageList[i], titleList[i])
+            val dataClass = DataClass(imageList[i], titleList[i], descList[i], descImageList[i])
             dataList.add(dataClass)
         }
         searchList.addAll(dataList)
